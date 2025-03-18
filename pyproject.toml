@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "server_common"  # REQUIRED, is the only field that cannot be marked as dynamic.
+dynamic = ["version"]
+description = "A collection of utilities for python based IOC servers used at ISIS"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+
+authors = [
+  {name = "ISIS Experiment Controls", email = "ISISExperimentControls@stfc.ac.uk" }
+]
+maintainers = [
+  {name = "ISIS Experiment Controls", email = "ISISExperimentControls@stfc.ac.uk" }
+]
+
+# Classifiers help users find your project by categorizing it.
+#
+# For a list of valid classifiers, see https://pypi.org/classifiers/
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+
+  # Specify the Python versions you support here. In particular, ensure
+  # that you indicate you support Python 3. These classifiers are *not*
+  # checked by "pip install". See instead "requires-python" key in this file.
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+dependencies = [
+  "pcaspy@git+https://github.com/ISISComputingGroup/pcaspy",
+  "CaChannel@git+https://github.com/ISISComputingGroup/CaChannel.git",
+  "genie-python",
+    "mock",
+    "parameterized",
+    "pysnmp",
+    "PyHamcrest"
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.8",
+  "pyright",
+  "pytest",
+  "pytest-cov",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/isiscomputinggroup/server_common"
+"Bug Reports" = "https://github.com/isiscomputinggroup/server_common/issues"
+"Source" = "https://github.com/isiscomputinggroup/server_common"
+
+[tool.setuptools_scm]
