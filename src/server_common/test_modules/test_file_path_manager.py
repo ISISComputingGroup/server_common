@@ -16,6 +16,7 @@
 
 import os
 import unittest
+from importlib.resources import as_file, files
 
 from server_common.file_path_manager import (
     COMPONENT_DIRECTORY,
@@ -26,21 +27,22 @@ from server_common.file_path_manager import (
 
 CONFIG_PATH = "./test_configs/"
 SCRIPT_PATH = "./test_scripts/"
-SCHEMA_FOLDER = "schema"
+
+
+SCHEMA_PATH = files("server_common.schema").joinpath("")
 
 
 class TestFilePathManagerSequence(unittest.TestCase):
     def setUp(self):
         # Find the schema directory
         dir = os.path.join(".")
-        while SCHEMA_FOLDER not in os.listdir(dir):
-            dir = os.path.join(dir, "..")
 
         self.config_path = os.path.abspath(CONFIG_PATH)
         self.script_path = os.path.abspath(SCRIPT_PATH)
-        FILEPATH_MANAGER.initialise(
-            self.config_path, self.script_path, os.path.join(dir, SCHEMA_FOLDER)
-        )
+        with as_file(SCHEMA_PATH) as schema_folder:
+            FILEPATH_MANAGER.initialise(
+                self.config_path, self.script_path, os.path.join(dir, schema_folder)
+            )
 
     def test_config_root_dir_correct(self):
         self.assertEqual(self.config_path, FILEPATH_MANAGER.config_root_dir)
