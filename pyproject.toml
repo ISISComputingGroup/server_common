@@ -64,3 +64,6 @@ dev = [
 "Source" = "https://github.com/isiscomputinggroup/server_common"
 
 [tool.setuptools_scm]
+
+[tool.setuptools.package-data]
+schema= ["schema/*"]
