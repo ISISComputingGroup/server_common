@@ -66,4 +66,4 @@ dev = [
 [tool.setuptools_scm]
 
 [tool.setuptools.package-data]
-schema= ["schema/*"]
+server_common = ["schema/*"]
