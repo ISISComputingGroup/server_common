@@ -42,7 +42,6 @@ classifiers = [
 
 dependencies = [
   "pcaspy@git+https://github.com/ISISComputingGroup/pcaspy",
-  "CaChannel@git+https://github.com/ISISComputingGroup/CaChannel.git",
   "genie-python[plot]==15.1.0",
     "mock",
     "parameterized",
