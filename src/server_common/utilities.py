@@ -371,3 +371,14 @@ def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
     except (ValueError, TypeError) as ex:
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         exit(error_code)
+
+def dehex_and_decompress_waveform_value(value):
+    """Decompresses the inputted waveform, assuming it is available as string.
+
+    Args:
+        value (str): The string to be decompressed
+
+    Returns:
+        str : A decompressed and unhexed version of the input string
+    """
+    return zlib.decompress(binascii.unhexlify(value))
