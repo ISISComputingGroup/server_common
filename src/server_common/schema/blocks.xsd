@@ -28,8 +28,6 @@
         <xs:element ref="blk:set_block_val" minOccurs="0"/>
         <xs:element ref="blk:alarm_enabled" minOccurs="0"/>
 		<xs:element ref="blk:alarm_latched" minOccurs="0"/>
-        <xs:element ref="blk:alarm_lowlimit" minOccurs="0"/>
-        <xs:element ref="blk:alarm_highlimit" minOccurs="0"/>
         <xs:element ref="blk:alarm_delay" minOccurs="0"/>
         <xs:element ref="blk:alarm_guidance" minOccurs="0"/>
 
@@ -51,8 +49,6 @@
   <xs:element name="set_block_val" type="xs:string"/>
   <xs:element name="alarm_enabled" type="xs:string"/>
   <xs:element name="alarm_latched" type="xs:string"/>
-  <xs:element name="alarm_lowlimit" type="xs:double"/>
-  <xs:element name="alarm_highlimit" type="xs:double"/>
   <xs:element name="alarm_delay" type="xs:double"/>
   <xs:element name="alarm_guidance" type="xs:string"/>
 </xs:schema>
