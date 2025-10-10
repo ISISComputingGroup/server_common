@@ -4,7 +4,7 @@ import unittest
 from concurrent.futures import wait
 from queue import Empty, Queue
 
-from hamcrest import *
+from hamcrest import assert_that, greater_than, has_length, is_, less_than_or_equal_to, none
 
 from server_common.channel_access import (
     NUMBER_OF_CAPUT_THREADS,
@@ -16,6 +16,13 @@ from server_common.channel_access import (
 
 thread_ids = Queue()
 thread_calls = Queue()
+
+
+try:
+    # Changed after CaChannel commit a112650d829138fbf63681772943a547215bdfb6
+    LOLO_ALARM_STATUS = AlarmStatus.LoLo
+except AttributeError:
+    LOLO_ALARM_STATUS = AlarmStatus.Lolo
 
 
 def set_pv_value(*args, **kwargs):
@@ -132,7 +139,7 @@ class TestMaximumSeverity(unittest.TestCase):
     def test_GIVEN_no_and_minor_major_WHEN_get_THEN_major_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
         minor_alarm = (AlarmSeverity.Minor, AlarmStatus.Low)
-        major_alarm = (AlarmSeverity.Major, AlarmStatus.Lolo)
+        major_alarm = (AlarmSeverity.Major, LOLO_ALARM_STATUS)
         result = maximum_severity(minor_alarm, major_alarm, no_alarms)
 
         assert_that(result, is_(major_alarm))
@@ -140,7 +147,7 @@ class TestMaximumSeverity(unittest.TestCase):
     def test_GIVEN_no_minor_major_and_invalid_WHEN_get_THEN_invalid_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
         minor_alarm = (AlarmSeverity.Minor, AlarmStatus.Low)
-        major_alarm = (AlarmSeverity.Major, AlarmStatus.Lolo)
+        major_alarm = (AlarmSeverity.Major, LOLO_ALARM_STATUS)
         invalid_alarm = (AlarmSeverity.Invalid, AlarmStatus.Timeout)
         result = maximum_severity(minor_alarm, invalid_alarm, major_alarm, no_alarms)
 

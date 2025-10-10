@@ -41,13 +41,13 @@ classifiers = [
 ]
 
 dependencies = [
-  "pcaspy@git+https://github.com/ISISComputingGroup/pcaspy",
+  "pcaspy",
   "genie-python[plot]",
-    "CaChannel@git+https://github.com/ISISComputingGroup/CaChannel.git",
-    "mock",
-    "parameterized",
-    "pysnmp",
-    "PyHamcrest"
+  "CaChannel",
+  "mock",
+  "parameterized",
+  "pysnmp",
+  "PyHamcrest"
 ]
 
 [project.optional-dependencies]
