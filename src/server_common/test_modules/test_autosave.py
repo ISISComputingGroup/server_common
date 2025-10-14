@@ -4,7 +4,6 @@ import os
 import shutil
 import unittest
 
-from hamcrest import *
 from parameterized import parameterized
 
 from server_common.autosave import (
@@ -80,7 +79,7 @@ class TestAutosave(unittest.TestCase):
         autosave.write_parameter(key, value)
         result = autosave.read_parameter(key, None)
 
-        assert_that(result, is_(value))
+        assert result == value
 
     def test_GIVEN_parameter_can_not_be_saved_as_float_WHEN_get_parameter_from_autosave_THEN_none_returned(
         self,
@@ -97,7 +96,7 @@ class TestAutosave(unittest.TestCase):
         autosave.write_parameter(key, value)
         result = autosave.read_parameter(key, None)
 
-        assert_that(result, is_(None))
+        assert result is None
 
     @parameterized.expand([(True,), (False,)])
     def test_GIVEN_true_saved_as_bool_WHEN_get_parameter_from_autosave_THEN_value_returned_as_ture(
@@ -114,7 +113,7 @@ class TestAutosave(unittest.TestCase):
         autosave.write_parameter(key, value)
         result = autosave.read_parameter(key, None)
 
-        assert_that(result, is_(value))
+        assert result == value
 
     def test_GIVEN_parameter_can_not_be_saved_as_bool_WHEN_get_parameter_from_autosave_THEN_none_returned(
         self,
@@ -131,7 +130,7 @@ class TestAutosave(unittest.TestCase):
         autosave.write_parameter(key, value)
         result = autosave.read_parameter(key, None)
 
-        assert_that(result, is_(None))
+        assert result is None
 
     @parameterized.expand([(1,), (None,)])
     def test_GIVEN_int_or_None_WHEN_get_parameter_from_autosave_THEN_value_returned(self, value):
@@ -146,7 +145,7 @@ class TestAutosave(unittest.TestCase):
         autosave.write_parameter(key, value)
         result = autosave.read_parameter(key, "not read")
 
-        assert_that(result, is_(value))
+        assert result == value
 
     def tearDown(self):
         try:

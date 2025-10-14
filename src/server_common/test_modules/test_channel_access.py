@@ -4,8 +4,6 @@ import unittest
 from concurrent.futures import wait
 from queue import Empty, Queue
 
-from hamcrest import assert_that, greater_than, has_length, is_, less_than_or_equal_to, none
-
 from server_common.channel_access import (
     NUMBER_OF_CAPUT_THREADS,
     AlarmSeverity,
@@ -58,7 +56,7 @@ class TestChannelAccess(unittest.TestCase):
 
         wait([future])
         time.sleep(3)  # wait for all items to finish
-        assert_that(len(empty_queue(thread_calls)), is_(1), "call is called once")
+        assert len(empty_queue(thread_calls)) == 1, "call is called once"
 
     def test_WHEN_multiple_ca_puts_and_not_wait_THEN_thread_count_is_limited(self):
         initial_thread_count = threading.active_count()
@@ -74,25 +72,21 @@ class TestChannelAccess(unittest.TestCase):
         current_count = threading.active_count()
 
         newly_created_threads = current_count - initial_thread_count
-        assert_that(
-            newly_created_threads,
-            is_(greater_than(NUMBER_OF_CAPUT_THREADS / 2)),
+        assert newly_created_threads > NUMBER_OF_CAPUT_THREADS / 2, (
             "Number of threads running (thread count: initial {} current {})".format(
                 initial_thread_count, current_count
-            ),
+            )
         )
 
-        assert_that(
-            newly_created_threads,
-            is_(less_than_or_equal_to(NUMBER_OF_CAPUT_THREADS)),
+        assert newly_created_threads <= NUMBER_OF_CAPUT_THREADS, (
             "Number of threads running (thread count: initial {} current {})".format(
                 initial_thread_count, current_count
-            ),
+            )
         )
 
         wait(the_future)
         time.sleep(3)  # wait for all items to finish
-        assert_that(len(empty_queue(thread_calls)), is_(2 * NUMBER_OF_CAPUT_THREADS))
+        assert len(empty_queue(thread_calls)) == 2 * NUMBER_OF_CAPUT_THREADS
 
     def test_WHEN_multiple_ca_puts_THEN_a_limited_number_of_threads_are_used(self):
         # This is so the same ca context and channels are used
@@ -110,31 +104,27 @@ class TestChannelAccess(unittest.TestCase):
 
         ids = set(empty_queue(thread_ids))
 
-        assert_that(
-            ids,
-            has_length(NUMBER_OF_CAPUT_THREADS),
-            "Number of ids should be the same as number of threads so that multiple tasks use the same thread",
-        )
+        assert len(ids) == NUMBER_OF_CAPUT_THREADS
 
 
 class TestMaximumSeverity(unittest.TestCase):
     def test_GIVEN_empty_list_WHEN_get_THEN_None_returned(self):
         result = maximum_severity()
 
-        assert_that(result, is_(none()))
+        assert result is None
 
     def test_GIVEN_one_entry_WHEN_get_THEN_that_entry_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
         result = maximum_severity(no_alarms)
 
-        assert_that(result, is_(no_alarms))
+        assert result == no_alarms
 
     def test_GIVEN_none_and_minor_WHEN_get_THEN_minor_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
         minor_alarm = (AlarmSeverity.Minor, AlarmStatus.Low)
         result = maximum_severity(minor_alarm, no_alarms)
 
-        assert_that(result, is_(minor_alarm))
+        assert result == minor_alarm
 
     def test_GIVEN_no_and_minor_major_WHEN_get_THEN_major_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
@@ -142,7 +132,7 @@ class TestMaximumSeverity(unittest.TestCase):
         major_alarm = (AlarmSeverity.Major, LOLO_ALARM_STATUS)
         result = maximum_severity(minor_alarm, major_alarm, no_alarms)
 
-        assert_that(result, is_(major_alarm))
+        assert result == major_alarm
 
     def test_GIVEN_no_minor_major_and_invalid_WHEN_get_THEN_invalid_returned(self):
         no_alarms = (AlarmSeverity.No, AlarmStatus.No)
@@ -151,7 +141,7 @@ class TestMaximumSeverity(unittest.TestCase):
         invalid_alarm = (AlarmSeverity.Invalid, AlarmStatus.Timeout)
         result = maximum_severity(minor_alarm, invalid_alarm, major_alarm, no_alarms)
 
-        assert_that(result, is_(invalid_alarm))
+        assert result == invalid_alarm
 
     def test_GIVEN_two_minor_alarms_WHEN_get_THEN_first_returned(self):
         minor_alarm1 = (AlarmSeverity.Minor, AlarmStatus.Low)
@@ -159,4 +149,4 @@ class TestMaximumSeverity(unittest.TestCase):
 
         result = maximum_severity(minor_alarm1, minor_alarm2)
 
-        assert_that(result, is_(minor_alarm1))
+        assert result == minor_alarm1

@@ -16,8 +16,8 @@
 
 import unittest
 
+import pytest
 from genie_python.mysql_abstraction_layer import AbstractSQLCommands, DatabaseError
-from hamcrest import *
 from mock import Mock
 
 from server_common.ioc_data_source import IocDataSource
@@ -55,7 +55,7 @@ class TestIocDataSource(unittest.TestCase):
 
         result = data_source.get_pv_logging_info()
 
-        assert_that(result, is_(expected_result))
+        assert result == expected_result
 
     def test_GIVEN_no_logging_annotations_request_WHEN_get_values_THEN_empty_dictionary_returned(
         self,
@@ -67,7 +67,7 @@ class TestIocDataSource(unittest.TestCase):
 
         result = data_source.get_pv_logging_info()
 
-        assert_that(result, is_(expected_result))
+        assert result == expected_result
 
     def test_GIVEN_multiple_logging_annotations_over_multiple_iocs_WHEN_get_values_THEN_values_returned_grouped_by_ioc(
         self,
@@ -87,14 +87,15 @@ class TestIocDataSource(unittest.TestCase):
 
         result = data_source.get_pv_logging_info()
 
-        assert_that(result, is_(expected_result))
+        assert result == expected_result
 
     def test_GIVEN_database_error_WHEN_get_values_THEN_error(self):
         mysql_abstraction_layer = SQLAbstractionStubForIOC({})
         mysql_abstraction_layer.query = Mock(side_effect=DatabaseError("DB Error"))
         data_source = IocDataSource(mysql_abstraction_layer)
 
-        assert_that(calling(data_source.get_pv_logging_info), raises(DatabaseError))
+        with pytest.raises(DatabaseError):
+            data_source.get_pv_logging_info()
 
     def test_GIVEN_ioc_with_pvs_WHEN_pvdump_THEN_calls_are_made_to_delete_previous_entries(self):
         mysql_abstraction_layer = SQLAbstractionStubForIOC({})
@@ -102,8 +103,8 @@ class TestIocDataSource(unittest.TestCase):
 
         data_source.insert_ioc_start("name", 12, "path", {}, "prefix")
 
-        assert_that(mysql_abstraction_layer.sql[0], contains_string("DELETE FROM iocrt"))
-        assert_that(mysql_abstraction_layer.sql[1], contains_string("DELETE FROM pvs"))
+        assert "DELETE FROM iocrt" in mysql_abstraction_layer.sql[0]
+        assert "DELETE FROM pvs" in mysql_abstraction_layer.sql[1]
 
     def test_GIVEN_ioc_with_pvs_WHEN_pvdump_has_database_error_THEN_no_exception_raised(self):
         mysql_abstraction_layer = SQLAbstractionStubForIOC({})
@@ -118,7 +119,7 @@ class TestIocDataSource(unittest.TestCase):
 
         data_source.insert_ioc_start("name", 12, "path", {}, "prefix")
 
-        assert_that(mysql_abstraction_layer.sql[2], contains_string("INSERT INTO iocrt"))
+        assert "INSERT INTO iocrt" in mysql_abstraction_layer.sql[2]
 
     def test_GIVEN_ioc_with_pvs_WHEN_pvdump_THEN_calls_are_made_to_add_pvs_with_correct_types_and_names_and_default_type_is_float(
         self,
@@ -140,15 +141,17 @@ class TestIocDataSource(unittest.TestCase):
         data_source.insert_ioc_start(iocname, 12, "path", pvs, prefix)
 
         for sql in mysql_abstraction_layer.sql[3:5]:
-            assert_that(sql, contains_string("INSERT INTO pvs"))
+            assert "INSERT INTO pvs" in sql
 
-        assert_that(
-            mysql_abstraction_layer.sql_param[3:5],
-            contains_inanyorder(
-                (expected_name1, expected_type1, description, iocname),
-                (expected_name2, expected_type2, "", iocname),
-            ),
-        )
+        assert (
+            expected_name1,
+            expected_type1,
+            description,
+            iocname,
+        ) in mysql_abstraction_layer.sql_param[3:5]
+        assert (expected_name2, expected_type2, "", iocname) in mysql_abstraction_layer.sql_param[
+            3:5
+        ]
 
     def test_GIVEN_ioc_with_pvs_with_pv_info_WHEN_pvdump_THEN_calls_are_made_to_add_pv_info_with_correct_pv_names_info_names_and_values(
         self,
@@ -167,9 +170,7 @@ class TestIocDataSource(unittest.TestCase):
         data_source.insert_ioc_start("name", 12, "path", pvs, prefix)
 
         for sql in mysql_abstraction_layer.sql[4:]:
-            assert_that(sql, contains_string("INSERT INTO pvinfo"))
+            assert "INSERT INTO pvinfo" in sql
 
-        assert_that(
-            mysql_abstraction_layer.sql_param[4:],
-            contains_inanyorder((expected_name1, name1, value1), (expected_name1, name2, value2)),
-        )
+        assert (expected_name1, name1, value1) in mysql_abstraction_layer.sql_param[4:]
+        assert (expected_name1, name2, value2) in mysql_abstraction_layer.sql_param[4:]

@@ -5,7 +5,6 @@ import re
 import unittest
 from datetime import datetime
 
-from hamcrest import *
 from mock import Mock, patch
 
 from server_common.loggers.isis_logger import IsisLogger, IsisPutLog
@@ -30,7 +29,7 @@ class TestISISLog(unittest.TestCase):
         logger.stop_thread_pool()
 
         sent_xml = mock_socket.sendall.call_args[0][0]
-        assert_that(str(sent_xml), contains_string(message))
+        assert message in str(sent_xml)
 
     @patch("socket.socket")
     def test_GIVEN_logger_WHEN_message_sent_THEN_connection_on_logger_port_is_opened_and_close(
@@ -58,7 +57,7 @@ class TestISISLog(unittest.TestCase):
         IsisLogger.executor.shutdown(wait=True)
 
         sent_xml = mock_socket.sendall.call_args[0][0]
-        assert_that(str(sent_xml), contains_string(expected_ioc_name))
+        assert expected_ioc_name in str(sent_xml)
 
     @patch("socket.socket")
     def test_GIVEN_logger_with_ioc_name_WHEN_message_sent_THEN_message_contains_ioc_name(
@@ -74,7 +73,7 @@ class TestISISLog(unittest.TestCase):
         IsisLogger.executor.shutdown(wait=True)
 
         sent_xml = mock_socket.sendall.call_args[0][0]
-        assert_that(str(sent_xml), contains_string(expected_ioc_name))
+        assert expected_ioc_name in str(sent_xml)
 
     @patch("socket.socket")
     def test_GIVEN_logger_with_ioc_name_WHEN_message_sent_with_ioc_name_THEN_message_contains_sent_ioc_name(
@@ -90,7 +89,7 @@ class TestISISLog(unittest.TestCase):
         IsisLogger.executor.shutdown(wait=True)
 
         sent_xml = mock_socket.sendall.call_args[0][0]
-        assert_that(str(sent_xml), contains_string(expected_ioc_name))
+        assert expected_ioc_name in str(sent_xml)
 
     @patch("socket.socket")
     @patch("datetime.datetime")
@@ -116,4 +115,4 @@ class TestISISLog(unittest.TestCase):
 
         sent_xml = mock_socket.sendall.call_args[0][0]
         match = re.search("<!\[CDATA\[(.*)\]\]>", str(sent_xml))
-        assert_that(match.group(1), is_(expected_message))
+        assert match.group(1) == expected_message
