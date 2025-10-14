@@ -26,7 +26,7 @@ except AttributeError:
 def set_pv_value(*args, **kwargs):
     """Mock method with set pv value signature, must take some time to work"""
     thread_calls.put((args, kwargs))
-    thread_ids.put(threading.currentThread().ident)
+    thread_ids.put(threading.current_thread().ident)
     time.sleep(0.5)
 
 
