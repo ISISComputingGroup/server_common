@@ -18,7 +18,7 @@ import unittest
 
 import pytest
 from genie_python.mysql_abstraction_layer import AbstractSQLCommands, DatabaseError
-from mock import Mock
+from unittest.mock import Mock
 
 from server_common.ioc_data_source import IocDataSource
 

@@ -43,8 +43,6 @@ dependencies = [
   "pcaspy",
   "genie-python[plot]",
   "CaChannel",
-  "mock",
-  "parameterized",
   "pysnmp",
 ]
 
