@@ -20,7 +20,7 @@ class TestAutosave(unittest.TestCase):
     def setUp(self):
         try:
             os.makedirs(TEMP_FOLDER)
-        except:
+        except OSError:
             pass
         self.autosave = AutosaveFile(
             service_name="unittests", file_name="test_file", folder=TEMP_FOLDER
@@ -148,7 +148,4 @@ class TestAutosave(unittest.TestCase):
         assert result == value
 
     def tearDown(self):
-        try:
-            shutil.rmtree(TEMP_FOLDER)
-        except:
-            pass
+        shutil.rmtree(TEMP_FOLDER, ignore_errors=True)
