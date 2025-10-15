@@ -29,7 +29,7 @@ CONFIG_PATH = "./test_configs/"
 SCRIPT_PATH = "./test_scripts/"
 
 
-SCHEMA_PATH = files("server_common.schema").joinpath("")
+SCHEMA_PATH = files("server_common.schema")
 
 
 class TestFilePathManagerSequence(unittest.TestCase):
