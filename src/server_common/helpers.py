@@ -3,7 +3,6 @@ import os
 import sys
 from typing import Dict
 
-from genie_python import genie as g
 from genie_python.mysql_abstraction_layer import SQLAbstraction
 
 from server_common.ioc_data_source import IocDataSource
@@ -48,9 +47,6 @@ def get_macro_values() -> Dict[str, str]:
     macros = {key: value for (key, value) in macros.items()}
     print("Defined macros: " + str(macros))
     return macros
-
-
-motor_in_set_mode = g.adv.motor_in_set_mode
 
 
 def _get_env_var(name: str) -> str:
