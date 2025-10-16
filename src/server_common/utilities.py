@@ -24,6 +24,7 @@ import re
 import threading
 import time
 import zlib
+from typing import Any, Iterable
 from xml.etree import ElementTree
 
 from server_common.common_exceptions import MaxAttemptsExceededException
@@ -113,6 +114,14 @@ def dehex_and_decompress(value):
     )
     return zlib.decompress(binascii.unhexlify(value))
 
+def dehex_decompress_and_dejson(value: bytes) -> Any:  # noqa: ANN401
+    """
+    Convert string from zipped hexed json to a python representation
+    :param value: value to convert
+    :return: python representation of json
+    """
+    return json.loads(dehex_and_decompress(value))
+
 
 def dehex_and_decompress_waveform(value):
     """Decompresses the inputted waveform, assuming it is a array of integers representing characters (null terminated).
@@ -157,7 +166,7 @@ def convert_from_json(value):
     return json.loads(value)
 
 
-def parse_boolean(string):
+def parse_boolean(string: str) -> bool:
     """Parses an xml true/false value to boolean
 
     Args:
@@ -265,19 +274,21 @@ def parse_xml_removing_namespace(file_path):
     return it.root
 
 
-def waveform_to_string(data):
+def waveform_to_string(data: Iterable[int | str]) -> str:
     """
     Args:
         data: waveform as null terminated string
 
     Returns: waveform as a sting
-
     """
-    output = str()
+    output = ""
     for i in data:
         if i == 0:
             break
-        output += chr(i)
+        if isinstance(i, str):
+            output += i
+        else:
+            output += str(chr(i))
     return output
 
 
@@ -294,7 +305,7 @@ def ioc_restart_pending(ioc_pv, channel_access):
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts, interval, exception):
+def retry(max_attempts: int, interval: int, exception: BaseException):
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
@@ -327,7 +338,7 @@ def retry(max_attempts, interval, exception):
     return _tags_decorator
 
 
-def remove_from_end(string, text_to_remove):
+def remove_from_end(string: str, text_to_remove: str) -> str:
     """
     Remove a String from the end of a string if it exists
     Args:
@@ -342,7 +353,7 @@ def remove_from_end(string, text_to_remove):
     return string
 
 
-def lowercase_and_make_unique(in_list):
+def lowercase_and_make_unique(in_list: list[str]) -> set[str]:
     """
     Takes a collection of strings, and returns it with all strings lowercased and with duplicates removed.
 

@@ -35,7 +35,7 @@ SCHEMA_PATH = files("server_common.schema")
 class TestFilePathManagerSequence(unittest.TestCase):
     def setUp(self):
         # Find the schema directory
-        dir = os.path.join(".")
+        dir = os.path.join("../src/server_common/test_modules")
 
         self.config_path = os.path.abspath(CONFIG_PATH)
         self.script_path = os.path.abspath(SCRIPT_PATH)

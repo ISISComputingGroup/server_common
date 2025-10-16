@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "server_common"  # REQUIRED, is the only field that cannot be marked as dynamic.
 dynamic = ["version"]
-description = "A collection of utilities for python based IOC servers used at ISIS"
+description = "A collection of helper utilities for python used at ISIS"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {file = "LICENSE"}
@@ -39,14 +39,17 @@ classifiers = [
 ]
 
 dependencies = [
+]
+
+[project.optional-dependencies]
+epics = [
   "pcaspy",
   "genie-python[plot]",
   "CaChannel",
   "pysnmp",
 ]
-
-[project.optional-dependencies]
 dev = [
+  "server_common[epics]",
   "ruff>=0.8",
   "pyright",
   "pytest",
