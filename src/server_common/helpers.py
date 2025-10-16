@@ -48,6 +48,7 @@ def get_macro_values() -> Dict[str, str]:
     print("Defined macros: " + str(macros))
     return macros
 
+
 MACROS = {
     "$(MYPVPREFIX)": os.environ.get("MYPVPREFIX", ""),
     "$(EPICS_KIT_ROOT)": os.environ.get("EPICS_KIT_ROOT", ""),
