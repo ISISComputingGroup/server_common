@@ -24,83 +24,14 @@ from server_common.utilities import print_and_log
 # Number of threads to serve caputs
 NUMBER_OF_CAPUT_THREADS = 20
 
-try:
-    from genie_python.channel_access_exceptions import (
-        ReadAccessException,
-        UnableToConnectToPVException,
-    )  # noqa: F401
-except ImportError:
-
-    class UnableToConnectToPVException(IOError):  # noqa: N818
-        """
-        The system is unable to connect to a PV for some reason.
-        """
-
-        def __init__(self, pv_name: str, err: Exception) -> None:
-            super(UnableToConnectToPVException, self).__init__(
-                "Unable to connect to PV {0}: {1}".format(pv_name, err)
-            )
-
-    class ReadAccessException(IOError):  # noqa: N818
-        """
-        PV exists but its value is unavailable to read.
-        """
-
-        def __init__(self, pv_name: str) -> None:
-            super(ReadAccessException, self).__init__(
-                "Read access denied for PV {}".format(pv_name)
-            )
-
-
-try:
-    # noinspection PyUnresolvedReferences
-    from genie_python.genie_cachannel_wrapper import EXIST_TIMEOUT, CaChannelWrapper
-except ImportError:
-    print("ERROR: No genie_python on the system can not import CaChannelWrapper!")
-
-try:
-    from genie_python.genie_cachannel_wrapper import AlarmCondition as AlarmStatus
-    from genie_python.genie_cachannel_wrapper import AlarmSeverity
-except ImportError:
-    from enum import IntEnum
-
-    class AlarmSeverity(IntEnum):
-        """
-        Enum for severity of alarm
-        """
-
-        No = 0
-        Minor = 1
-        Major = 2
-        Invalid = 3
-
-    class AlarmStatus(IntEnum):
-        """
-        Enum for status of alarm
-        """
-
-        BadSub = 16
-        Calc = 12
-        Comm = 9
-        Cos = 8
-        Disable = 18
-        High = 4
-        HiHi = 3
-        HwLimit = 11
-        Link = 14
-        Lolo = 5
-        Low = 6
-        No = 0
-        Read = 1
-        ReadAccess = 20
-        Scam = 13
-        Simm = 19
-        Soft = 15
-        State = 7
-        Timeout = 10
-        UDF = 17
-        Write = 2
-        WriteAccess = 21
+from genie_python.channel_access_exceptions import (
+    ReadAccessException,
+    UnableToConnectToPVException,
+)
+from genie_python.genie_cachannel_wrapper import EXIST_TIMEOUT, CaChannelWrapper
+from genie_python.genie_cachannel_wrapper import AlarmCondition as AlarmStatus # noqa: F401
+from genie_python.genie_cachannel_wrapper import AlarmSeverity # noqa: F401
+from genie_python.genie_advanced import motor_in_set_mode # noqa: F401
 
 
 def _create_caput_pool() -> ThreadPoolExecutor:
