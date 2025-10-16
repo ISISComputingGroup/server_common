@@ -31,7 +31,6 @@ from genie_python.channel_access_exceptions import (
 from genie_python.genie_cachannel_wrapper import EXIST_TIMEOUT, CaChannelWrapper
 from genie_python.genie_cachannel_wrapper import AlarmCondition as AlarmStatus # noqa: F401
 from genie_python.genie_cachannel_wrapper import AlarmSeverity # noqa: F401
-from genie_python.genie_advanced import motor_in_set_mode # noqa: F401
 
 
 def _create_caput_pool() -> ThreadPoolExecutor:
