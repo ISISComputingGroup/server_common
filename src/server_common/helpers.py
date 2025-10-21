@@ -3,7 +3,6 @@ import os
 import sys
 from typing import Dict
 
-from genie_python import genie as g
 from genie_python.mysql_abstraction_layer import SQLAbstraction
 
 from server_common.ioc_data_source import IocDataSource
@@ -50,21 +49,11 @@ def get_macro_values() -> Dict[str, str]:
     return macros
 
 
-motor_in_set_mode = g.adv.motor_in_set_mode
-
-
-def _get_env_var(name: str) -> str:
-    try:
-        return os.environ[name]
-    except:
-        return ""
-
-
 MACROS = {
-    "$(MYPVPREFIX)": _get_env_var("MYPVPREFIX"),
-    "$(EPICS_KIT_ROOT)": _get_env_var("EPICS_KIT_ROOT"),
-    "$(ICPCONFIGROOT)": _get_env_var("ICPCONFIGROOT"),
-    "$(ICPVARDIR)": _get_env_var("ICPVARDIR"),
+    "$(MYPVPREFIX)": os.environ.get("MYPVPREFIX", ""),
+    "$(EPICS_KIT_ROOT)": os.environ.get("EPICS_KIT_ROOT", ""),
+    "$(ICPCONFIGROOT)": os.environ.get("ICPCONFIGROOT", ""),
+    "$(ICPVARDIR)": os.environ.get("ICPVARDIR", ""),
 }
 CONTROL_SYSTEM_PREFIX = MACROS["$(MYPVPREFIX)"] + "CS:"
 PVPREFIX_MACRO = "$(MYPVPREFIX)"
