@@ -5,13 +5,13 @@ jobs:
     uses: ISISComputingGroup/reusable-workflows/.github/workflows/linters.yml@main
     with:
       compare-branch: origin/main
-      python-ver: '3.11'
+      python-ver: '3.12'
       runs-on: windows-latest
   tests:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: ['3.11']
+        version: ['3.12']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,3 +34,4 @@ jobs:
                contains(needs.*.result, 'failure')
             || contains(needs.*.result, 'cancelled')
           }}
+
