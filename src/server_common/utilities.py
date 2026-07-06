@@ -385,4 +385,5 @@ def dehex_and_decompress_waveform_value(value):
     Returns:
         str : A decompressed and unhexed version of the input string
     """
-    return zlib.decompress(binascii.unhexlify(value))
+
+    return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
