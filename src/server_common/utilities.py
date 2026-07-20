@@ -29,7 +29,6 @@ from xml.etree import ElementTree
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
-# ruff: noqa: ANN001, ANN201, ANN002, ANN003, ANN202, E721
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
