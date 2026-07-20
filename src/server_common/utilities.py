@@ -29,6 +29,7 @@ from xml.etree import ElementTree
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
+# ruff: noqa: ANN001, ANN201, ANN002, ANN003, ANN202, E721
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
@@ -372,7 +373,7 @@ def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         exit(error_code)
 
-# fmt: off
+
 def dehex_and_decompress_waveform_value(value):
     """Decompresses the inputted waveform, assuming it is available as string.
 
@@ -389,4 +390,3 @@ def dehex_and_decompress_waveform_value(value):
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
         raise ValueError(f"Invalid hex string: odd length ({len(value)})")
-# fmt: on
