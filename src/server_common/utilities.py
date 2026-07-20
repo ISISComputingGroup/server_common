@@ -372,6 +372,7 @@ def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         exit(error_code)
 
+# fmt: off
 def dehex_and_decompress_waveform_value(value):
     """Decompresses the inputted waveform, assuming it is available as string.
 
@@ -388,3 +389,4 @@ def dehex_and_decompress_waveform_value(value):
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
         raise ValueError(f"Invalid hex string: odd length ({len(value)})")
+# fmt: on
