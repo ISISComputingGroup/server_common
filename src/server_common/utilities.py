@@ -29,7 +29,6 @@ from xml.etree import ElementTree
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
-# ruff: noqa: ANN001, ANN201, ANN002, ANN003, ANN202, E721
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
@@ -380,10 +379,13 @@ def dehex_and_decompress_waveform_value(value):
     """Decompresses the inputted waveform, assuming it is available as string.
 
     Args:
-        value (str): The string to be decompressed
+        value: The string to be decompressed
 
     Returns:
         str : A decompressed and unhexed version of the input string
     """
+    if value and len(value) % 2 == 0:
+        return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
+    else:
+        raise ValueError(f"Invalid hex string: odd length ({len(value)})")
 
-    return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
