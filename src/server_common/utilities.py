@@ -388,4 +388,3 @@ def dehex_and_decompress_waveform_value(value):
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
         raise ValueError(f"Invalid hex string: odd length ({len(value)})")
-
