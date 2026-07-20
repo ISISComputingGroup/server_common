@@ -30,6 +30,7 @@ from xml.etree import ElementTree
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
+# ruff: noqa: ANN401
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
@@ -68,7 +69,9 @@ def set_logger(logger: Logger) -> None:
     LOGGER = logger
 
 
-def print_and_log(message: str | Any, severity=SEVERITY.INFO, src="BLOCKSVR") -> None:
+def print_and_log(
+    message: str | object, severity: str = SEVERITY.INFO, src: str = "BLOCKSVR"
+) -> None:
     """Prints the specified message to the console and writes it to the log.
 
     Args:
@@ -102,7 +105,7 @@ def compress_and_hex(value: str) -> bytes:
     return binascii.hexlify(compr)
 
 
-def dehex_and_decompress(value: bytes) -> bytes | Any:
+def dehex_and_decompress(value: bytes) -> bytes:
     """Decompresses the inputted string, assuming it is in hex encoding.
 
     Args:
@@ -118,8 +121,9 @@ def dehex_and_decompress(value: bytes) -> bytes | Any:
     return zlib.decompress(binascii.unhexlify(value))
 
 
-def dehex_and_decompress_waveform(value: list) -> bytes | Any:
-    """Decompresses the inputted waveform, assuming it is a array of integers representing characters (null terminated).
+def dehex_and_decompress_waveform(value: list) -> bytes:
+    """Decompresses the inputted waveform, assuming it is an array of integers
+        representing characters (null terminated).
 
     Args:
         value (list[int]): The string to be decompressed
@@ -149,7 +153,7 @@ def convert_to_json(value: object) -> str:
     return json.dumps(value)
 
 
-def convert_from_json(value: str) -> Any:
+def convert_from_json(value: str) -> object:
     """Converts the inputted string into a JSON object.
 
     Args:
@@ -187,10 +191,12 @@ def value_list_to_xml(
     """Converts a list of values to corresponding xml.
 
     Args:
-        value_list (dict[str, dict[object, object]]): The dictionary of names and their values, values are in turn a
-            dictionary of names and value {name: {parameter : value, parameter : value}}
+        value_list (dict[str, dict[object, object]]): The dictionary of names and their values,
+            values are in turn a dictionary of names and value {name: {parameter : value,
+            parameter : value}}
         grp (ElementTree.SubElement): The SubElement object to append the list on to
-        group_tag (string): The tag that corresponds to the group for the items given in the list e.g. macros
+        group_tag (string): The tag that corresponds to the group for the items given in the list
+            e.g. macros
         item_tag (string): The tag that corresponds to each item in the list e.g. macro
     """
     xml_list = ElementTree.SubElement(grp, group_tag)
@@ -302,7 +308,7 @@ def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts: int, interval: int, exception: Any):
+def retry(max_attempts: int, interval: int, exception: Any) -> Any:
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
@@ -316,8 +322,8 @@ def retry(max_attempts: int, interval: int, exception: Any):
 
     """
 
-    def _tags_decorator(func):
-        def _wrapper(*args, **kwargs):
+    def _tags_decorator(func: Any) -> Any:
+        def _wrapper(*args: Any, **kwargs: Any) -> Any:
             attempts = 0
             last_exception = ValueError("Max attempts should be > 0, it is {}".format(max_attempts))
             while attempts < max_attempts:
@@ -352,7 +358,8 @@ def remove_from_end(string: str | None, text_to_remove: str) -> str | None:
 
 def lowercase_and_make_unique(in_list: list[str]) -> set[str]:
     """
-    Takes a collection of strings, and returns it with all strings lowercased and with duplicates removed.
+    Takes a collection of strings, and returns it with all strings lowercased and with duplicates
+        removed.
 
     Args:
         in_list (List[str]): the collection of strings to operate on
