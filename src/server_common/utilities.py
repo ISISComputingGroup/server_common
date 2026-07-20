@@ -232,7 +232,7 @@ def create_pv_name(
         current_pvs (list): List of already allocated pvs
         default_pv (string): Basis for the PV if name is unreasonable, must be a valid PV name
         limit (integer): Character limit for the PV
-        allow_colon (bool): If True, pv name is allowed to contain colons; if False, remove the colons
+        allow_colon (bool): If True, pv name is allowed to contain colons; else, remove the colons
 
     Returns:
         string : A valid PV
