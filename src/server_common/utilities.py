@@ -24,6 +24,7 @@ import re
 import threading
 import time
 import zlib
+from typing import Any
 from xml.etree import ElementTree
 
 from server_common.common_exceptions import MaxAttemptsExceededException
@@ -44,7 +45,7 @@ class SEVERITY(object):
     MAJOR = "MAJOR"
 
 
-def char_waveform(length):
+def char_waveform(length: object) -> dict[str, str | list[int] | Any]:
     """
     Helper function for creating a char waveform PV.
 
@@ -57,7 +58,7 @@ def char_waveform(length):
     return {"type": "char", "count": length, "value": [0]}
 
 
-def set_logger(logger):
+def set_logger(logger: Logger) -> None:
     """Sets the logger used by the print_and_log function.
 
     Args:
@@ -67,13 +68,13 @@ def set_logger(logger):
     LOGGER = logger
 
 
-def print_and_log(message, severity=SEVERITY.INFO, src="BLOCKSVR"):
+def print_and_log(message: str | Any, severity=SEVERITY.INFO, src="BLOCKSVR") -> None:
     """Prints the specified message to the console and writes it to the log.
 
     Args:
         message (string|exception): The message to log
-        severity (string, optional): Gives the severity of the message. Expected serverities are MAJOR, MINOR and INFO.
-                                    Default severity is INFO.
+        severity (string, optional): Gives the severity of the message. Expected severities are
+                                    MAJOR, MINOR and INFO. Default severity is INFO.
         src (string, optional): Gives the source of the message. Default source is BLOCKSVR.
     """
     with _LOGGER_LOCK:
@@ -82,7 +83,7 @@ def print_and_log(message, severity=SEVERITY.INFO, src="BLOCKSVR"):
         LOGGER.write_to_log(message, severity, src)
 
 
-def compress_and_hex(value):
+def compress_and_hex(value: str) -> bytes:
     """Compresses the inputted string and encodes it as hex.
 
     Args:
@@ -90,15 +91,18 @@ def compress_and_hex(value):
     Returns:
         bytes : A compressed and hexed version of the inputted string
     """
-    assert type(value) == str, (
-        "Non-str argument passed to compress_and_hex, maybe Python 2/3 compatibility issue\n"
-        "Argument was type {} with value {}".format(value.__class__.__name__, value)
+    (
+        isinstance(value, str),
+        (
+            "Non-str argument passed to compress_and_hex, maybe Python 2/3 compatibility issue\n"
+            "Argument was type {} with value {}".format(value.__class__.__name__, value)
+        ),
     )
     compr = zlib.compress(bytes(value, "utf-8"))
     return binascii.hexlify(compr)
 
 
-def dehex_and_decompress(value):
+def dehex_and_decompress(value: bytes) -> bytes | Any:
     """Decompresses the inputted string, assuming it is in hex encoding.
 
     Args:
@@ -107,14 +111,14 @@ def dehex_and_decompress(value):
     Returns:
         bytes : A decompressed version of the inputted string
     """
-    assert type(value) == bytes, (
+    assert isinstance(value, bytes), (
         "Non-bytes argument passed to dehex_and_decompress, maybe Python 2/3 compatibility issue\n"
         "Argument was type {} with value {}".format(value.__class__.__name__, value)
     )
     return zlib.decompress(binascii.unhexlify(value))
 
 
-def dehex_and_decompress_waveform(value):
+def dehex_and_decompress_waveform(value: list) -> bytes | Any:
     """Decompresses the inputted waveform, assuming it is a array of integers representing characters (null terminated).
 
     Args:
@@ -123,7 +127,7 @@ def dehex_and_decompress_waveform(value):
     Returns:
         bytes : A decompressed version of the inputted string
     """
-    assert type(value) == list, (
+    assert isinstance(value, list), (
         "Non-list argument passed to dehex_and_decompress_waveform\n"
         "Argument was type {} with value {}".format(value.__class__.__name__, value)
     )
@@ -133,7 +137,7 @@ def dehex_and_decompress_waveform(value):
     return dehex_and_decompress(bytes_rep)
 
 
-def convert_to_json(value):
+def convert_to_json(value: object) -> str:
     """Converts the inputted object to JSON format.
 
     Args:
@@ -145,7 +149,7 @@ def convert_to_json(value):
     return json.dumps(value)
 
 
-def convert_from_json(value):
+def convert_from_json(value: str) -> Any:
     """Converts the inputted string into a JSON object.
 
     Args:
@@ -157,7 +161,7 @@ def convert_from_json(value):
     return json.loads(value)
 
 
-def parse_boolean(string):
+def parse_boolean(string: str) -> bool:
     """Parses an xml true/false value to boolean
 
     Args:
@@ -177,12 +181,14 @@ def parse_boolean(string):
         raise ValueError(str(string) + ': Attribute must be "true" or "false"')
 
 
-def value_list_to_xml(value_list, grp, group_tag, item_tag):
+def value_list_to_xml(
+    value_list: dict, grp: ElementTree.Element, group_tag: str, item_tag: str
+) -> None:
     """Converts a list of values to corresponding xml.
 
     Args:
-        value_list (dist[str, dict[object, object]]): The dictionary of names and their values, values are in turn a
-            dictonary of names and value {name: {parameter : value, parameter : value}}
+        value_list (dict[str, dict[object, object]]): The dictionary of names and their values, values are in turn a
+            dictionary of names and value {name: {parameter : value, parameter : value}}
         grp (ElementTree.SubElement): The SubElement object to append the list on to
         group_tag (string): The tag that corresponds to the group for the items given in the list e.g. macros
         item_tag (string): The tag that corresponds to each item in the list e.g. macro
@@ -196,7 +202,7 @@ def value_list_to_xml(value_list, grp, group_tag, item_tag):
                 xml_item.set(str(cn), str(cv))
 
 
-def check_pv_name_valid(name):
+def check_pv_name_valid(name: str) -> bool:
     """Checks that text conforms to the ISIS PV naming standard
 
     Args:
@@ -210,7 +216,9 @@ def check_pv_name_valid(name):
     return True
 
 
-def create_pv_name(name, current_pvs, default_pv, limit=6, allow_colon=False):
+def create_pv_name(
+    name: str, current_pvs: list, default_pv: str, limit: int = 6, allow_colon: bool = False
+) -> str:
     """Uses the given name as a basis for a valid PV.
 
     Args:
@@ -249,7 +257,7 @@ def create_pv_name(name, current_pvs, default_pv, limit=6, allow_colon=False):
     return pv
 
 
-def parse_xml_removing_namespace(file_path):
+def parse_xml_removing_namespace(file_path: str) -> Any:
     """Creates an Element object from a given xml file, removing the namespace.
 
     Args:
@@ -265,7 +273,7 @@ def parse_xml_removing_namespace(file_path):
     return it.root
 
 
-def waveform_to_string(data):
+def waveform_to_string(data: Any) -> str:
     """
     Args:
         data: waveform as null terminated string
@@ -281,7 +289,7 @@ def waveform_to_string(data):
     return output
 
 
-def ioc_restart_pending(ioc_pv, channel_access):
+def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
     """Check if a particular IOC is restarting. Assumes it has suitable restart PV
 
     Args:
@@ -294,7 +302,7 @@ def ioc_restart_pending(ioc_pv, channel_access):
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts, interval, exception):
+def retry(max_attempts: int, interval: int, exception: Any):
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
@@ -327,7 +335,7 @@ def retry(max_attempts, interval, exception):
     return _tags_decorator
 
 
-def remove_from_end(string, text_to_remove):
+def remove_from_end(string: str | None, text_to_remove: str) -> str | None:
     """
     Remove a String from the end of a string if it exists
     Args:
@@ -342,7 +350,7 @@ def remove_from_end(string, text_to_remove):
     return string
 
 
-def lowercase_and_make_unique(in_list):
+def lowercase_and_make_unique(in_list: list[str]) -> set[str]:
     """
     Takes a collection of strings, and returns it with all strings lowercased and with duplicates removed.
 
@@ -355,7 +363,7 @@ def lowercase_and_make_unique(in_list):
     return {x.lower() for x in in_list}
 
 
-def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
+def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> datetime.datetime:
     """
     Parse a date argument and exit the program with an error code if that argument is not a date
     Args:
@@ -373,7 +381,7 @@ def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
         exit(error_code)
 
 
-def dehex_and_decompress_waveform_value(value):
+def dehex_and_decompress_waveform_value(value: str) -> str:
     """Decompresses the inputted waveform, assuming it is available as string.
 
     Args:
@@ -388,4 +396,4 @@ def dehex_and_decompress_waveform_value(value):
     if value and len(value) % 2 == 0:
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
-        raise ValueError(f"Invalid hex string: odd length ({len(value)})")
+        raise ValueError(f"Invalid hex string: value is empty or has odd length ({len(value)})")
