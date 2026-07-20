@@ -1,4 +1,4 @@
-# This file is part of the ISIS IBEX application.
+e is part of the ISIS IBEX application.
 # Copyright (C) 2012-2016 Science & Technology Facilities Council.
 # All rights reserved.
 #
@@ -72,8 +72,8 @@ def print_and_log(message, severity=SEVERITY.INFO, src="BLOCKSVR"):
 
     Args:
         message (string|exception): The message to log
-        severity (string, optional): Gives the severity of the message. Expected serverities are
-                                    MAJOR, MINOR and INFO. Default severity is INFO.
+        severity (string, optional): Gives the severity of the message. Expected serverities are MAJOR, MINOR and INFO.
+                                    Default severity is INFO.
         src (string, optional): Gives the source of the message. Default source is BLOCKSVR.
     """
     with _LOGGER_LOCK:
@@ -115,8 +115,7 @@ def dehex_and_decompress(value):
 
 
 def dehex_and_decompress_waveform(value):
-    """Decompresses the inputted waveform, assuming it is a array of integers
-    representing characters (null terminated).
+    """Decompresses the inputted waveform, assuming it is a array of integers representing characters (null terminated).
 
     Args:
         value (list[int]): The string to be decompressed
@@ -182,11 +181,11 @@ def value_list_to_xml(value_list, grp, group_tag, item_tag):
     """Converts a list of values to corresponding xml.
 
     Args:
-        value_list (dist[str, dict[object, object]]): The dictionary of names and their values,
-        values are in turn a dictonary of names and value {name:{parameter:value,parameter:value}}
+        value_list (dist[str, dict[object, object]]): The dictionary of names and their values, values are in turn a
+            dictonary of names and value {name: {parameter : value, parameter : value}}
         grp (ElementTree.SubElement): The SubElement object to append the list on to
-        group_tag (string): The tag that corresponds to the group for the items given in the list
-        e.g. macros item_tag (string): The tag that corresponds to each item in the list e.g. macro
+        group_tag (string): The tag that corresponds to the group for the items given in the list e.g. macros
+        item_tag (string): The tag that corresponds to each item in the list e.g. macro
     """
     xml_list = ElementTree.SubElement(grp, group_tag)
     if len(value_list) > 0:
@@ -219,7 +218,7 @@ def create_pv_name(name, current_pvs, default_pv, limit=6, allow_colon=False):
         current_pvs (list): List of already allocated pvs
         default_pv (string): Basis for the PV if name is unreasonable, must be a valid PV name
         limit (integer): Character limit for the PV
-        allow_colon (bool): If True,pv name is allowed to contain colons;if False,remove the colons
+        allow_colon (bool): If True, pv name is allowed to contain colons; if False, remove the colons
 
     Returns:
         string : A valid PV
@@ -345,8 +344,7 @@ def remove_from_end(string, text_to_remove):
 
 def lowercase_and_make_unique(in_list):
     """
-    Takes a collection of strings, and returns it with all strings lowercased and with duplicates
-    removed.
+    Takes a collection of strings, and returns it with all strings lowercased and with duplicates removed.
 
     Args:
         in_list (List[str]): the collection of strings to operate on
@@ -374,7 +372,6 @@ def parse_date_time_arg_exit_on_fail(date_arg, error_code=1):
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         exit(error_code)
 
-
 def dehex_and_decompress_waveform_value(value):
     """Decompresses the inputted waveform, assuming it is available as string.
 
@@ -383,6 +380,9 @@ def dehex_and_decompress_waveform_value(value):
 
     Returns:
         str : A decompressed and unhexed version of the input string
+
+    Raises:
+        ValueError : If the supplied string is not valid hexadecimal characters
     """
     if value and len(value) % 2 == 0:
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
