@@ -388,7 +388,7 @@ def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> date
         exit(error_code)
 
 
-def dehex_and_decompress_waveform_value(value: str) -> str:
+def dehex_and_decompress_waveform_value(value: str | bytes) -> str:
     """Decompresses the inputted waveform, assuming it is available as string.
 
     Args:
