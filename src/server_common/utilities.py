@@ -30,13 +30,12 @@ from xml.etree import ElementTree
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
-# ruff: noqa: ANN401
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
 
 
-class SEVERITY(object):
+class SEVERITY:
     """
     Standard message severities.
     """
@@ -81,7 +80,7 @@ def print_and_log(
         src (string, optional): Gives the source of the message. Default source is BLOCKSVR.
     """
     with _LOGGER_LOCK:
-        message = "[{}] {}: {}".format(datetime.datetime.now(), severity, message)
+        message = f"[{datetime.datetime.now()}] {severity}: {message}"  # ruff: ignore [DTZ005]
         print(message)
         LOGGER.write_to_log(message, severity, src)
 
@@ -98,7 +97,7 @@ def compress_and_hex(value: str) -> bytes:
         isinstance(value, str),
         (
             "Non-str argument passed to compress_and_hex, maybe Python 2/3 compatibility issue\n"
-            "Argument was type {} with value {}".format(value.__class__.__name__, value)
+            f"Argument was type {value.__class__.__name__} with value {value}"
         ),
     )
     compr = zlib.compress(bytes(value, "utf-8"))
@@ -116,7 +115,7 @@ def dehex_and_decompress(value: bytes) -> bytes:
     """
     assert isinstance(value, bytes), (
         "Non-bytes argument passed to dehex_and_decompress, maybe Python 2/3 compatibility issue\n"
-        "Argument was type {} with value {}".format(value.__class__.__name__, value)
+        f"Argument was type {value.__class__.__name__} with value {value}"
     )
     return zlib.decompress(binascii.unhexlify(value))
 
@@ -133,7 +132,7 @@ def dehex_and_decompress_waveform(value: list) -> bytes:
     """
     assert isinstance(value, list), (
         "Non-list argument passed to dehex_and_decompress_waveform\n"
-        "Argument was type {} with value {}".format(value.__class__.__name__, value)
+        f"Argument was type {value.__class__.__name__} with value {value}"
     )
 
     unicode_rep = waveform_to_string(value)
@@ -217,13 +216,15 @@ def check_pv_name_valid(name: str) -> bool:
     Returns:
         bool : True if text conforms to standard, False otherwise
     """
-    if re.match(r"[A-Za-z0-9_]*", name) is None:
-        return False
-    return True
+    return re.match(r"[A-Za-z0-9_]*", name) is not None
 
 
 def create_pv_name(
-    name: str, current_pvs: list, default_pv: str, limit: int = 6, allow_colon: bool = False
+    name: str,
+    current_pvs: list,
+    default_pv: str,
+    limit: int = 6,
+    allow_colon: bool = False,
 ) -> str:
     """Uses the given name as a basis for a valid PV.
 
@@ -287,7 +288,7 @@ def waveform_to_string(data: Any) -> str:
     Returns: waveform as a sting
 
     """
-    output = str()
+    output = ""
     for i in data:
         if i == 0:
             break
@@ -325,7 +326,7 @@ def retry(max_attempts: int, interval: int, exception: Any) -> Any:
     def _tags_decorator(func: Any) -> Any:
         def _wrapper(*args: Any, **kwargs: Any) -> Any:
             attempts = 0
-            last_exception = ValueError("Max attempts should be > 0, it is {}".format(max_attempts))
+            last_exception = ValueError(f"Max attempts should be > 0, it is {max_attempts}")
             while attempts < max_attempts:
                 try:
                     return func(*args, **kwargs)
@@ -382,7 +383,7 @@ def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> date
 
     """
     try:
-        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")
+        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")  # ruff:ignore [DTZ007]
     except (ValueError, TypeError) as ex:
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         raise SystemExit(error_code)
