@@ -385,7 +385,7 @@ def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> date
         return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")
     except (ValueError, TypeError) as ex:
         print(f"Can not interpret date '{date_arg}' error: {ex}")
-        exit(error_code)
+        raise SystemExit(error_code)
 
 
 def dehex_and_decompress_waveform_value(value: str | bytes) -> str:
