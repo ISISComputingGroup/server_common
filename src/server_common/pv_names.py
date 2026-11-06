@@ -75,6 +75,7 @@ class BlockserverPVNames:
     CURR_CONFIG_NAME = prepend_blockserver("CURR_CONFIG_NAME")
     CURR_CONFIG_NAME_SEVR = prepend_blockserver("CURR_CONFIG_NAME.SEVR")
     HEARTBEAT = "IOC:BLOCKSVR:DEVIOS:HEARTBEAT"
+    RESTART_PR_IOC = prepend_blockserver("RESTART_PR_IOC")
 
     @staticmethod
     def get_config_details_pv(pv_key):
