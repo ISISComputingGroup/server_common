@@ -40,6 +40,7 @@ class DatabasePVNames:
     MOXA_MAPPINGS = prepend_blockserver("MOXA_MAPPINGS")
     UPDATE_MOXA_MAPPINGS = prepend_blockserver("UPDATE_MM")
     NUM_MOXAS = prepend_blockserver("NUM_MOXAS")
+    RESTART = prepend_blockserver("RESTART_DBSRV")
 
 
 class BlockserverPVNames:
