@@ -17,7 +17,7 @@
 BLOCKSERVER = "BLOCKSERVER:"
 
 
-def prepend_blockserver(base_name):
+def prepend_blockserver(base_name: str) -> str:
     return BLOCKSERVER + base_name
 
 
@@ -79,13 +79,13 @@ class BlockserverPVNames:
     RESTART_PROTECTED_IOC = prepend_blockserver("RESTART_PROTECTED_IOC")
 
     @staticmethod
-    def get_config_details_pv(pv_key):
+    def get_config_details_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":GET_CONFIG_DETAILS")
 
     @staticmethod
-    def get_component_details_pv(pv_key):
+    def get_component_details_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":GET_COMPONENT_DETAILS")
 
     @staticmethod
-    def get_dependencies_pv(pv_key):
+    def get_dependencies_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":DEPENDENCIES")
