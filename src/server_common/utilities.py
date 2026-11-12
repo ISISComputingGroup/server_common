@@ -152,7 +152,7 @@ def convert_to_json(value: object) -> str:
     return json.dumps(value)
 
 
-def convert_from_json(value: str) -> object:
+def convert_from_json(value: str) -> Any:
     """Converts the inputted string into a JSON object.
 
     Args:
@@ -309,7 +309,7 @@ def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts: int, interval: int, exception: Any) -> Any:
+def retry(max_attempts: int, interval: float, exception: Any) -> Any:
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
