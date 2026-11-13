@@ -25,18 +25,17 @@ import re
 import threading
 import time
 import zlib
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from typing import Any, ParamSpec, TypeVar
 from xml.etree import ElementTree
 
+from server_common.channel_access import ChannelAccess
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
 # Default to base class - does not actually log anything
 LOGGER = Logger()
-_LOGGER_LOCK = (
-    threading.RLock()
-)  # To prevent message interleaving between different threads.
+_LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
 
 P = ParamSpec("P")  # Captures function arguments
 R = TypeVar("R")  # Captures return type
@@ -146,7 +145,7 @@ def dehex_and_decompress_waveform(value: list) -> bytes:
     return dehex_and_decompress(bytes_rep)
 
 
-def convert_to_json(value: object) -> str:
+def convert_to_json(value: Any) -> str:  # noqa: ANN401
     """Converts the inputted object to JSON format.
 
     Args:
@@ -158,7 +157,7 @@ def convert_to_json(value: object) -> str:
     return json.dumps(value)
 
 
-def convert_from_json(value: str) -> Any:
+def convert_from_json(value: str) -> Any:  # noqa: ANN401
     """Converts the inputted string into a JSON object.
 
     Args:
@@ -270,7 +269,7 @@ def create_pv_name(
     return pv
 
 
-def parse_xml_removing_namespace(file_path: str) -> Any:
+def parse_xml_removing_namespace(file_path: str) -> Any:  # noqa: ANN401
     """Creates an Element object from a given xml file, removing the namespace.
 
     Args:
@@ -286,7 +285,7 @@ def parse_xml_removing_namespace(file_path: str) -> Any:
     return it.root  # type: ignore[union-attr]
 
 
-def waveform_to_string(data: Any) -> str:
+def waveform_to_string(data: Iterable[int | str]) -> str:
     """
     Args:
         data: waveform as null terminated string
@@ -298,11 +297,14 @@ def waveform_to_string(data: Any) -> str:
     for i in data:
         if i == 0:
             break
-        output += chr(i)
+        if isinstance(i, str):
+            output += i
+        else:
+            output += str(chr(i))
     return output
 
 
-def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
+def ioc_restart_pending(ioc_pv: str, channel_access: ChannelAccess) -> bool:
     """Check if a particular IOC is restarting. Assumes it has suitable restart PV
 
     Args:
@@ -382,9 +384,7 @@ def lowercase_and_make_unique(in_list: list[str]) -> set[str]:
     return {x.lower() for x in in_list}
 
 
-def parse_date_time_arg_exit_on_fail(
-    date_arg: str, error_code: int = 1
-) -> datetime.datetime:
+def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> datetime.datetime:
     """
     Parse a date argument and exit the program with an error code if that argument is not a date
     Args:
@@ -417,6 +417,4 @@ def dehex_and_decompress_waveform_value(value: str | bytes) -> str:
     if value and len(value) % 2 == 0:
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
-        raise ValueError(
-            f"Invalid hex string: value is empty or has odd length ({len(value)})"
-        )
+        raise ValueError(f"Invalid hex string: value is empty or has odd length ({len(value)})")
