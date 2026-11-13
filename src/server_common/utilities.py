@@ -304,7 +304,7 @@ def waveform_to_string(data: Iterable[int | str]) -> str:
     return output
 
 
-def ioc_restart_pending(ioc_pv: str, channel_access: ChannelAccess) -> bool:
+def ioc_restart_pending(ioc_pv: str, channel_access: type[ChannelAccess]) -> bool:
     """Check if a particular IOC is restarting. Assumes it has suitable restart PV
 
     Args:
