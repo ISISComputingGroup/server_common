@@ -13,17 +13,18 @@
 # along with this program; if not, you can obtain a copy from
 # https://www.eclipse.org/org/documents/epl-v10.php or
 # http://opensource.org/licenses/eclipse-1.0.php
+from typing import Any
 
 
 class MockCAServer:
-    def __init__(self):
+    def __init__(self) -> None:
         self.pv_list = {}
 
-    def updatePV(self, pv_name, data):
+    def updatePV(self, pv_name: str, data: dict[str, str | list[int] | Any]) -> None:  # noqa: N802
         self.pv_list[pv_name] = data
 
-    def deletePV(self, pv_name):
+    def deletePV(self, pv_name: str) -> None:  # noqa: N802
         del self.pv_list[pv_name]
 
-    def createPV(self, prefix, pvdb):
+    def createPV(self, prefix: str, pvdb: dict[str, dict[str, str | list[int] | Any]]) -> None:  # noqa: N802
         self.pv_list[pvdb["name"]] = pvdb
