@@ -26,12 +26,14 @@ import threading
 import time
 import zlib
 from collections.abc import Callable, Iterable
-from typing import Any, ParamSpec, TypeVar
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 from xml.etree import ElementTree
 
-from server_common.channel_access import ChannelAccess
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
+
+if TYPE_CHECKING:
+    from server_common.channel_access import ChannelAccess
 
 # Default to base class - does not actually log anything
 LOGGER = Logger()
@@ -304,7 +306,7 @@ def waveform_to_string(data: Iterable[int | str]) -> str:
     return output
 
 
-def ioc_restart_pending(ioc_pv: str, channel_access: type[ChannelAccess]) -> bool:
+def ioc_restart_pending(ioc_pv: str, channel_access: "type[ChannelAccess]") -> bool:
     """Check if a particular IOC is restarting. Assumes it has suitable restart PV
 
     Args:
