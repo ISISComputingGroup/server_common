@@ -17,7 +17,7 @@
 BLOCKSERVER = "BLOCKSERVER:"
 
 
-def prepend_blockserver(base_name):
+def prepend_blockserver(base_name: str) -> str:
     return BLOCKSERVER + base_name
 
 
@@ -40,6 +40,7 @@ class DatabasePVNames:
     MOXA_MAPPINGS = prepend_blockserver("MOXA_MAPPINGS")
     UPDATE_MOXA_MAPPINGS = prepend_blockserver("UPDATE_MM")
     NUM_MOXAS = prepend_blockserver("NUM_MOXAS")
+    RESTART = prepend_blockserver("RESTART_DBSVR")
 
 
 class BlockserverPVNames:
@@ -75,15 +76,16 @@ class BlockserverPVNames:
     CURR_CONFIG_NAME = prepend_blockserver("CURR_CONFIG_NAME")
     CURR_CONFIG_NAME_SEVR = prepend_blockserver("CURR_CONFIG_NAME.SEVR")
     HEARTBEAT = "IOC:BLOCKSVR:DEVIOS:HEARTBEAT"
+    RESTART_SERVICE_IOC = prepend_blockserver("RESTART_SERVICE_IOC")
 
     @staticmethod
-    def get_config_details_pv(pv_key):
+    def get_config_details_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":GET_CONFIG_DETAILS")
 
     @staticmethod
-    def get_component_details_pv(pv_key):
+    def get_component_details_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":GET_COMPONENT_DETAILS")
 
     @staticmethod
-    def get_dependencies_pv(pv_key):
+    def get_dependencies_pv(pv_key: str) -> str:
         return prepend_blockserver(pv_key + ":DEPENDENCIES")

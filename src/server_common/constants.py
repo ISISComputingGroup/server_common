@@ -30,4 +30,16 @@ IOCS_NOT_TO_STOP = (
     "ALARM",
     "BSKAFKA",
 )
+SERVICE_IOCS = (
+    "INSTETC",
+    "ISISDAE",
+    "BLOCKSVR",
+    "ARINST",
+    "ARBLOCK",
+    "GWBLOCK",
+    "RUNCTRL",
+    "ALARM",
+    "BSKAFKA",
+    "DBSVR",
+)
 IS_LINUX = os.name != "nt"

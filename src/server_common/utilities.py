@@ -19,20 +19,28 @@ Utilities for running block server and related ioc's.
 
 import binascii
 import datetime
+import functools
 import json
 import re
 import threading
 import time
 import zlib
-from typing import Any
+from collections.abc import Callable, Iterable
+from typing import TYPE_CHECKING, Any, ParamSpec, TypeVar
 from xml.etree import ElementTree
 
 from server_common.common_exceptions import MaxAttemptsExceededException
 from server_common.loggers.logger import Logger
 
+if TYPE_CHECKING:
+    from server_common.channel_access import ChannelAccess
+
 # Default to base class - does not actually log anything
 LOGGER = Logger()
 _LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
+
+P = ParamSpec("P")  # Captures function arguments
+R = TypeVar("R")  # Captures return type
 
 
 class SEVERITY:
@@ -80,7 +88,7 @@ def print_and_log(
         src (string, optional): Gives the source of the message. Default source is BLOCKSVR.
     """
     with _LOGGER_LOCK:
-        message = f"[{datetime.datetime.now()}] {severity}: {message}"  # ruff: ignore [DTZ005]
+        message = f"[{datetime.datetime.now()}] {severity}: {message}"
         print(message)
         LOGGER.write_to_log(message, severity, src)
 
@@ -93,13 +101,12 @@ def compress_and_hex(value: str) -> bytes:
     Returns:
         bytes : A compressed and hexed version of the inputted string
     """
-    (
-        isinstance(value, str),
-        (
+    if not isinstance(value, str):
+        raise TypeError(
             "Non-str argument passed to compress_and_hex, maybe Python 2/3 compatibility issue\n"
             f"Argument was type {value.__class__.__name__} with value {value}"
-        ),
-    )
+        )
+
     compr = zlib.compress(bytes(value, "utf-8"))
     return binascii.hexlify(compr)
 
@@ -140,7 +147,7 @@ def dehex_and_decompress_waveform(value: list) -> bytes:
     return dehex_and_decompress(bytes_rep)
 
 
-def convert_to_json(value: object) -> str:
+def convert_to_json(value: Any) -> str:  # noqa: ANN401
     """Converts the inputted object to JSON format.
 
     Args:
@@ -152,7 +159,7 @@ def convert_to_json(value: object) -> str:
     return json.dumps(value)
 
 
-def convert_from_json(value: str) -> object:
+def convert_from_json(value: str) -> Any:  # noqa: ANN401
     """Converts the inputted string into a JSON object.
 
     Args:
@@ -264,7 +271,7 @@ def create_pv_name(
     return pv
 
 
-def parse_xml_removing_namespace(file_path: str) -> Any:
+def parse_xml_removing_namespace(file_path: str) -> Any:  # noqa: ANN401
     """Creates an Element object from a given xml file, removing the namespace.
 
     Args:
@@ -277,10 +284,10 @@ def parse_xml_removing_namespace(file_path: str) -> Any:
     for _, el in it:
         if ":" in el.tag:
             el.tag = el.tag.split("}", 1)[1]
-    return it.root
+    return it.root  # type: ignore[union-attr]
 
 
-def waveform_to_string(data: Any) -> str:
+def waveform_to_string(data: Iterable[int | str]) -> str:
     """
     Args:
         data: waveform as null terminated string
@@ -292,11 +299,14 @@ def waveform_to_string(data: Any) -> str:
     for i in data:
         if i == 0:
             break
-        output += chr(i)
+        if isinstance(i, str):
+            output += i
+        else:
+            output += str(chr(i))
     return output
 
 
-def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
+def ioc_restart_pending(ioc_pv: str, channel_access: "type[ChannelAccess]") -> bool:
     """Check if a particular IOC is restarting. Assumes it has suitable restart PV
 
     Args:
@@ -309,7 +319,9 @@ def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts: int, interval: int, exception: Any) -> Any:
+def retry(
+    max_attempts: int, interval: float, exception: type[Exception]
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
@@ -323,10 +335,13 @@ def retry(max_attempts: int, interval: int, exception: Any) -> Any:
 
     """
 
-    def _tags_decorator(func: Any) -> Any:
-        def _wrapper(*args: Any, **kwargs: Any) -> Any:
+    def _tags_decorator(func: Callable[P, R]) -> Callable[P, R]:
+        @functools.wraps(func)
+        def _wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             attempts = 0
-            last_exception = ValueError(f"Max attempts should be > 0, it is {max_attempts}")
+            last_exception: Exception = ValueError(
+                f"Max attempts should be > 0, it is {max_attempts}"
+            )
             while attempts < max_attempts:
                 try:
                     return func(*args, **kwargs)
@@ -383,7 +398,7 @@ def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> date
 
     """
     try:
-        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")  # ruff:ignore [DTZ007]
+        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")
     except (ValueError, TypeError) as ex:
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         raise SystemExit(error_code)
