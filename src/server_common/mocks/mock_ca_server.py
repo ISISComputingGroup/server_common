@@ -15,12 +15,15 @@
 # http://opensource.org/licenses/eclipse-1.0.php
 
 
-class MockCAServer(object):
+class MockCAServer:
     def __init__(self):
-        self.pv_list = dict()
+        self.pv_list = {}
 
     def updatePV(self, pv_name, data):
         self.pv_list[pv_name] = data
 
     def deletePV(self, pv_name):
         del self.pv_list[pv_name]
+
+    def createPV(self, prefix, pvdb):
+        self.pv_list[pvdb["name"]] = pvdb
