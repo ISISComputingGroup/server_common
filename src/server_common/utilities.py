@@ -19,12 +19,14 @@ Utilities for running block server and related ioc's.
 
 import binascii
 import datetime
+import functools
 import json
 import re
 import threading
 import time
 import zlib
-from typing import Any
+from collections.abc import Callable
+from typing import Any, ParamSpec, TypeVar
 from xml.etree import ElementTree
 
 from server_common.common_exceptions import MaxAttemptsExceededException
@@ -32,7 +34,12 @@ from server_common.loggers.logger import Logger
 
 # Default to base class - does not actually log anything
 LOGGER = Logger()
-_LOGGER_LOCK = threading.RLock()  # To prevent message interleaving between different threads.
+_LOGGER_LOCK = (
+    threading.RLock()
+)  # To prevent message interleaving between different threads.
+
+P = ParamSpec("P")  # Captures function arguments
+R = TypeVar("R")  # Captures return type
 
 
 class SEVERITY:
@@ -93,13 +100,12 @@ def compress_and_hex(value: str) -> bytes:
     Returns:
         bytes : A compressed and hexed version of the inputted string
     """
-    (
-        isinstance(value, str),
-        (
+    if not isinstance(value, str):
+        raise TypeError(
             "Non-str argument passed to compress_and_hex, maybe Python 2/3 compatibility issue\n"
             f"Argument was type {value.__class__.__name__} with value {value}"
-        ),
-    )
+        )
+
     compr = zlib.compress(bytes(value, "utf-8"))
     return binascii.hexlify(compr)
 
@@ -309,7 +315,9 @@ def ioc_restart_pending(ioc_pv: Any, channel_access: Any) -> Any:
     return channel_access.caget(ioc_pv + ":RESTART", as_string=True) == "Busy"
 
 
-def retry(max_attempts: int, interval: float, exception: Any) -> Any:
+def retry(
+    max_attempts: int, interval: float, exception: type[Exception]
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """
     Attempt to perform a function a number of times in specified intervals before failing.
 
@@ -323,10 +331,13 @@ def retry(max_attempts: int, interval: float, exception: Any) -> Any:
 
     """
 
-    def _tags_decorator(func: Any) -> Any:
-        def _wrapper(*args: Any, **kwargs: Any) -> Any:
+    def _tags_decorator(func: Callable[P, R]) -> Callable[P, R]:
+        @functools.wraps(func)
+        def _wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             attempts = 0
-            last_exception = ValueError(f"Max attempts should be > 0, it is {max_attempts}")
+            last_exception: Exception = ValueError(
+                f"Max attempts should be > 0, it is {max_attempts}"
+            )
             while attempts < max_attempts:
                 try:
                     return func(*args, **kwargs)
@@ -371,7 +382,9 @@ def lowercase_and_make_unique(in_list: list[str]) -> set[str]:
     return {x.lower() for x in in_list}
 
 
-def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> datetime.datetime:
+def parse_date_time_arg_exit_on_fail(
+    date_arg: str, error_code: int = 1
+) -> datetime.datetime:
     """
     Parse a date argument and exit the program with an error code if that argument is not a date
     Args:
@@ -404,4 +417,6 @@ def dehex_and_decompress_waveform_value(value: str | bytes) -> str:
     if value and len(value) % 2 == 0:
         return zlib.decompress(binascii.unhexlify(value)).decode("utf-8")
     else:
-        raise ValueError(f"Invalid hex string: value is empty or has odd length ({len(value)})")
+        raise ValueError(
+            f"Invalid hex string: value is empty or has odd length ({len(value)})"
+        )
