@@ -283,7 +283,7 @@ def parse_xml_removing_namespace(file_path: str) -> Any:
     for _, el in it:
         if ":" in el.tag:
             el.tag = el.tag.split("}", 1)[1]
-    return it.root
+    return it.root  # type: ignore[union-attr]
 
 
 def waveform_to_string(data: Any) -> str:
