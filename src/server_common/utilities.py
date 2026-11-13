@@ -86,7 +86,7 @@ def print_and_log(
         src (string, optional): Gives the source of the message. Default source is BLOCKSVR.
     """
     with _LOGGER_LOCK:
-        message = f"[{datetime.datetime.now()}] {severity}: {message}"  # ruff: ignore [DTZ005]
+        message = f"[{datetime.datetime.now()}] {severity}: {message}"
         print(message)
         LOGGER.write_to_log(message, severity, src)
 
@@ -396,7 +396,7 @@ def parse_date_time_arg_exit_on_fail(date_arg: str, error_code: int = 1) -> date
 
     """
     try:
-        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")  # ruff:ignore [DTZ007]
+        return datetime.datetime.strptime(date_arg, "%Y-%m-%dT%H:%M:%S")
     except (ValueError, TypeError) as ex:
         print(f"Can not interpret date '{date_arg}' error: {ex}")
         raise SystemExit(error_code)
